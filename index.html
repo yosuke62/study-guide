@@ -1,0 +1,465 @@
+<!doctype html>
+<html lang="ja" data-theme="light">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>高校生を応援する家庭サポートガイド（4:3）</title>
+  <style>
+    :root {
+      --bg: #f5f8ff;
+      --bg-accent: radial-gradient(1000px 700px at 70% -20%, rgba(191, 219, 254, 0.45), transparent),
+                   radial-gradient(900px 600px at 0% 100%, rgba(221, 214, 254, 0.45), transparent),
+                   linear-gradient(180deg, #f8fbff, #edf3ff);
+      --page-bg: rgba(255,255,255,0.95);
+      --page-border: rgba(99,102,241,0.14);
+      --text: #1f2937;
+      --muted: #5b6478;
+      --accent: #2563eb;
+      --accent-2: #8b5cf6;
+      --good: #16a34a;
+      --warn: #f97316;
+      --bad: #dc2626;
+      --shadow: 0 18px 42px rgba(148,163,184,.28);
+      --card-bg: linear-gradient(180deg, rgba(255,255,255,.96), rgba(242,246,255,.94));
+      --card-border: rgba(99,102,241,.18);
+      --glass: linear-gradient(180deg, rgba(255,255,255,.9), rgba(224,232,255,.72));
+      --progress-track: rgba(99,102,241,.18);
+      --radius: 26px;
+
+      --w: min(92vw, 92vh * 4 / 3);
+      --h: calc(var(--w) * 3 / 4);
+      --pad: clamp(18px, 2.4vw, 36px);
+
+      --h1: clamp(28px, 3.4vw, 46px);
+      --h2: clamp(22px, 2.6vw, 34px);
+      --h3: clamp(17px, 2vw, 24px);
+      --p: clamp(14px, 1.6vw, 19px);
+      --small: clamp(12px, 1.3vw, 15px);
+      --mono: "SFMono-Regular", Menlo, Consolas, "Liberation Mono", monospace;
+    }
+
+    :root[data-theme="dark"]{
+      --bg: #0f172a;
+      --bg-accent: radial-gradient(1000px 700px at 70% -20%, rgba(56, 189, 248, 0.25), transparent),
+                   radial-gradient(900px 600px at 0% 100%, rgba(124, 58, 237, 0.25), transparent),
+                   linear-gradient(180deg, #0f172a, #0b1222);
+      --page-bg: rgba(15,23,42,0.92);
+      --page-border: rgba(148,163,184,0.28);
+      --text: #e2e8f0;
+      --muted: #94a3b8;
+      --accent: #7dd3fc;
+      --accent-2: #c4b5fd;
+      --shadow: 0 12px 36px rgba(0,0,0,0.45);
+      --card-bg: linear-gradient(180deg, rgba(15,23,42,.92), rgba(30,41,59,.92));
+      --card-border: rgba(148,163,184,.28);
+      --glass: linear-gradient(180deg, rgba(30,41,59,.72), rgba(15,23,42,.76));
+      --progress-track: rgba(148,163,184,.24);
+    }
+
+    html,body{
+      height:100%;
+      background: var(--bg);
+      background-image: var(--bg-accent);
+      color: var(--text);
+      margin:0;
+      font-family: "Hiragino Sans","Noto Sans JP","Yu Gothic UI","YuGothic","Meiryo", -apple-system, system-ui, "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+      letter-spacing:.02em;
+    }
+
+    .toolbar{
+      position: fixed;
+      inset: 18px 18px auto 18px;
+      display:flex;
+      align-items:center;
+      justify-content: space-between;
+      gap:16px;
+      z-index:20;
+      pointer-events:none;
+    }
+    .toolbar .left,.toolbar .right{
+      display:flex; gap:10px; align-items:center; pointer-events:auto;
+    }
+    .brand{
+      display:flex; align-items:center; gap:12px; padding:10px 16px; border-radius:999px;
+      background: var(--glass); border:1px solid var(--page-border); font-weight:600; color:var(--muted); font-size:14px;
+      backdrop-filter: blur(8px);
+    }
+    .brand .dot{ width:12px; height:12px; border-radius:50%; background: linear-gradient(135deg, var(--accent), var(--accent-2)); box-shadow: 0 0 0 5px rgba(37,99,235,.15);}
+    .kicker{ font-weight:600; color:var(--accent); letter-spacing:.1em; font-size:11px; text-transform: uppercase;}
+
+    .btn{
+      appearance:none; border:none; outline:none;
+      padding:9px 14px; border-radius:12px; background: var(--glass);
+      border:1px solid var(--page-border); color:var(--text); font-weight:600; font-size:13px; cursor:pointer;
+      transition:.2s transform, .2s filter;
+    }
+    .btn:hover{ filter:brightness(1.05);}
+    .btn:active{ transform: translateY(1px); }
+    .btn.primary{ background: linear-gradient(135deg, var(--accent), var(--accent-2)); color:white; border:none; }
+
+    .deck{
+      width:100%; height:100%; display:grid; place-items:center;
+      padding:80px 0; box-sizing:border-box;
+    }
+    .pages{
+      position:relative; width:var(--w); height:var(--h); border-radius: var(--radius);
+      background: var(--page-bg); border:1px solid var(--page-border); box-shadow: var(--shadow);
+      overflow:hidden; isolation:isolate;
+    }
+
+    .page{
+      position:absolute; inset:0; display:grid; grid-template-rows:auto 1fr auto;
+      padding: var(--pad); box-sizing:border-box;
+      opacity:0; pointer-events:none; transform: translateX(32px) scale(.98);
+      transition: opacity .35s ease, transform .35s ease;
+    }
+    .page.active{ opacity:1; pointer-events:auto; transform: translateX(0) scale(1); }
+
+    .page header{ display:flex; align-items:flex-start; justify-content:space-between; gap:28px; margin-bottom:20px;}
+    .page h1{ font-size: var(--h1); line-height:1.2; margin:0; }
+    .page h2{ font-size: var(--h2); line-height:1.25; margin:0; }
+    .page h3{ font-size: var(--h3); margin:.5em 0 .3em; color: var(--accent);}
+    .lead{ font-size: calc(var(--p)*1.05); color:var(--muted); max-width:52ch; }
+
+    .stack{ display:flex; flex-direction:column; gap: clamp(12px, 1.8vw, 20px); align-items:flex-end;}
+    .tag{ display:inline-flex; align-items:center; gap:8px; padding:6px 12px; border-radius:999px; font-size:12px; font-weight:700; letter-spacing:.03em; color:var(--text);
+      background: linear-gradient(135deg, rgba(37,99,235,.16), rgba(139,92,246,.16));
+      border:1px solid var(--card-border);
+    }
+    .tag.q::before{ content:"❓"; }
+    .tag.team::before{ content:"🤝"; }
+    .tag.voice::before{ content:"💬"; }
+    .tag.ai::before{ content:"🤖"; }
+
+    .grid-2{ display:grid; grid-template-columns: 1fr 1fr; gap: clamp(16px, 2.6vw, 32px); }
+    .grid-3{ display:grid; grid-template-columns: repeat(3, 1fr); gap: clamp(16px, 2.4vw, 28px); }
+    .card{
+      background: var(--card-bg);
+      border:1px solid var(--card-border);
+      border-radius:20px;
+      padding: clamp(16px, 2.2vw, 22px);
+      box-shadow: inset 0 1px 0 rgba(255,255,255,.7);
+    }
+    ul,ol{ margin:.3em 0; padding-left: 1.25em;}
+    li{ margin:.35em 0; font-size: var(--p); }
+    p{ font-size: var(--p); margin:.5em 0; }
+    .note{ font-size: var(--small); color: var(--muted); }
+    .pair{ display:grid; grid-template-columns: 1.05fr 1fr; gap:12px; align-items:start; }
+    .bad{ color: var(--bad); font-weight:700;}
+    .good{ color: var(--good); font-weight:700;}
+
+    .footer{
+      display:flex; justify-content:space-between; align-items:center; font-size:var(--small); color:var(--muted); margin-top:12px;
+    }
+    .progress{
+      position:absolute; left: var(--pad); right: var(--pad); bottom: 14px; height:4px;
+      background: var(--progress-track); border-radius:999px; overflow:hidden;
+    }
+    .progress > i{ display:block; height:100%; width:0%; background: linear-gradient(90deg, var(--accent), var(--accent-2)); }
+
+    .nav{
+      position:fixed; right:26px; bottom:26px; display:flex; gap:10px; z-index:30; pointer-events:auto;
+    }
+    .indicator{
+      position:fixed; left:24px; bottom:26px; padding:9px 14px; border-radius:12px;
+      background: var(--glass); border:1px solid var(--page-border); font-weight:700; color:var(--muted); z-index:30;
+    }
+
+    @media print{
+      body{ background:white; }
+      .toolbar, .nav, .indicator{ display:none !important; }
+      .deck{ padding:0; }
+      .pages{ width: 270mm; height: 202.5mm; box-shadow:none; border:none; }
+      .page{ position:relative; break-after:page; opacity:1 !important; transform:none !important; }
+      .progress{ display:none; }
+    }
+  </style>
+</head>
+<body>
+  <div class="toolbar" aria-hidden="false">
+    <div class="left">
+      <div class="brand"><span class="dot"></span><span>高校生サポート 家庭版</span></div>
+      <span class="kicker">4:3 SUPPORT DECK</span>
+    </div>
+    <div class="right">
+      <button class="btn small" id="theme">テーマ切替</button>
+      <button class="btn small" id="print">PDFで保存</button>
+    </div>
+  </div>
+
+  <div class="deck">
+    <div class="pages" id="pages" aria-live="polite">
+
+      <section class="page active" data-title="表紙">
+        <header>
+          <div>
+            <div class="kicker">高校生の成績アップを家庭から応援する</div>
+            <h1>「うちでもできる」高校生サポートガイド</h1>
+            <p class="lead">親ができる一番の支援は、安心できる環境と声かけを整えること。勉強の主役は本人のまま、家庭がチームで支えるポイントをまとめました。</p>
+          </div>
+          <div class="stack">
+            <span class="tag q">よく聞かれる質問に答えます</span>
+            <span class="tag team">親子で取り組めるヒント</span>
+          </div>
+        </header>
+        <div class="card">
+          <p><b>背景：</b>「親は子どもの成績アップのために何ができる？」という質問への私のアドバイスを整理した資料です。</p>
+          <p class="note">操作：←/→ または A/D で移動、Tでテーマ切替、Pで印刷保存。</p>
+        </div>
+        <div class="footer"><span>家庭サポートスタジオ</span><span>再配布可（出典明記）</span></div>
+        <div class="progress"><i></i></div>
+      </section>
+
+      <section class="page" data-title="基本姿勢">
+        <header><h2>基本姿勢：親の役割は「場づくり」と「心の伴走」</h2></header>
+        <div class="grid-2">
+          <div class="card">
+            <h3>1. 環境と心理サポートが主役</h3>
+            <ul>
+              <li>集中できる空間づくり、生活リズムの整備など<b>環境調整</b>がまず大切。</li>
+              <li>話を聴く、気持ちを受け止めるなど<b>心理的な安心</b>が学びの土台。</li>
+              <li>これだけでも十分に効果があると知っておく。</li>
+            </ul>
+          </div>
+          <div class="card">
+            <h3>2. 勉強の主役は本人</h3>
+            <ul>
+              <li>親が手取り足取り教えるほど、主体性が削がれるリスク。</li>
+              <li>ゴールは「自分で決めて動ける高校生」。親は舞台裏で支える。</li>
+              <li>関わりすぎず、でも孤立させない距離感を探る。</li>
+            </ul>
+          </div>
+        </div>
+        <div class="progress"><i></i></div>
+      </section>
+
+      <section class="page" data-title="専門外では">
+        <header><h2>専門外では教えすぎない：時代も内容も変わっています</h2></header>
+        <div class="card">
+          <p>親世代と現在では、出題の形式や学習範囲が大きく変化しています。専門的な知識を持っていない場合、無理に教えるよりも次の姿勢が安全です。</p>
+          <ul>
+            <li><b>質問には「どう調べるか」を一緒に考える。</b></li>
+            <li><b>勉強法の判断は学校や教材、専門家の情報を尊重。</b></li>
+            <li><b>「わからない」を許し、相談できる雰囲気を維持。</b></li>
+          </ul>
+          <p class="note">無理に教えようとすると、親子ともにストレスが増え、学習意欲が下がるケースが多いです。</p>
+        </div>
+        <div class="progress"><i></i></div>
+      </section>
+
+      <section class="page" data-title="共感の言葉">
+        <header><h2>共感から始める：自分が言われたらどう感じる？</h2></header>
+        <div class="grid-2">
+          <div class="card">
+            <h3>声をかける前のチェック</h3>
+            <ul>
+              <li>「自分が高校生のときに言われたら？」と想像する。</li>
+              <li>否定や比較ではなく、感情と事実を丁寧に聴く。</li>
+              <li>意見を伝える前に「そう感じたんだね」と一度受け止める。</li>
+            </ul>
+          </div>
+          <div class="card">
+            <h3>安心度を上げる一言</h3>
+            <ul>
+              <li>「話してくれてありがとう。どうすれば楽になるかな？」</li>
+              <li>「全部解決できなくても、一緒に考えるよ。」</li>
+              <li>「今は休む？それとも話しながら整理する？」</li>
+            </ul>
+            <p class="note">言葉の温度は表情や態度にも表れます。ゆっくり、柔らかく伝えましょう。</p>
+          </div>
+        </div>
+        <div class="progress"><i></i></div>
+      </section>
+
+      <section class="page" data-title="良い上司ロール">
+        <header><h2>親は「良い上司」ロールで：命令よりも対話で導く</h2></header>
+        <div class="card">
+          <p>子どもの成績を「部下の成果管理」のように扱うと、信頼関係が崩れます。もし仕事の癖が出やすいなら、理想の上司をイメージしましょう。</p>
+          <div class="grid-2">
+            <div>
+              <h3>良い上司の振る舞い</h3>
+              <ul>
+                <li>評価前に丁寧に聴く。</li>
+                <li>命令ではなく問いかけで促す。</li>
+                <li>失敗時は支え、次の一歩を一緒に考える。</li>
+              </ul>
+            </div>
+            <div>
+              <h3>家庭での置き換え</h3>
+              <ul>
+                <li>「どこでつまずいた？」と背景を聴く。</li>
+                <li>「次はどうする？」と本人の考えを引き出す。</li>
+                <li>提出物のフォローなど、裏方サポートに回る。</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+        <div class="progress"><i></i></div>
+      </section>
+
+      <section class="page" data-title="親も学ぶ">
+        <header><h2>親も学ぶ姿を見せる：雰囲気づくりが最大の後押し</h2></header>
+        <div class="card">
+          <p>親が机に向かっている時間があると、家全体が「学びモード」になります。内容は仕事でも資格でも趣味でもOK。大切なのは雰囲気と姿勢です。</p>
+          <ul>
+            <li>リビング学習の日は親も同じ空間で読書や仕事に集中。</li>
+            <li>学んだことを短く共有し、互いの努力を認め合う。</li>
+            <li>「今日の学び時間は何分？」と記録し合うゲーム感覚も効果的。</li>
+          </ul>
+          <p class="note">成果を比べず、過程を褒め合う場を親がつくることで、自然と自己肯定感が育ちます。</p>
+        </div>
+        <div class="progress"><i></i></div>
+      </section>
+
+      <section class="page" data-title="声かけ変換">
+        <header><h2>声かけを「命令形」から「問いかけ」へ変換する</h2></header>
+        <div class="card">
+          <p>本人の自発性を引き出すには、行動を直接指示するよりも、時間や目的を一緒に確認する問いかけが有効です。</p>
+          <div class="pair">
+            <div class="bad">✕ 「テスト勉強しなさい！」</div>
+            <div class="good">○ 「テストの日はいつ？今日できそうな準備はある？」</div>
+          </div>
+          <div class="pair">
+            <div class="bad">✕ 「早く宿題しないと！」</div>
+            <div class="good">○ 「いつやる予定だった？終わったら何を楽しみにする？」</div>
+          </div>
+          <div class="pair">
+            <div class="bad">✕ 「また忘れてる！」</div>
+            <div class="good">○ 「忘れない工夫を一緒に考えようか？タイマーとメモどっちが合いそう？」</div>
+          </div>
+        </div>
+        <div class="progress"><i></i></div>
+      </section>
+
+      <section class="page" data-title="サポート範囲">
+        <header><h2>親ができる具体サポート：マネジメントとAIの伴走</h2></header>
+        <div class="grid-2">
+          <div class="card">
+            <h3>学習マネジメント</h3>
+            <ul>
+              <li>予定や進捗を一緒に見渡し、抜けや無理をチェック。</li>
+              <li>締切や提出物をカレンダーで共有する。</li>
+              <li>ただし管理を肩代わりしすぎず、最終判断は本人へ返す。</li>
+            </ul>
+            <p class="note">長期的には自分で回せるよう、徐々に手を離す前提で支援。</p>
+          </div>
+          <div class="card">
+            <h3>AIを味方にする</h3>
+            <ul>
+              <li>親が先にAIの使い方を学び、良い質問例をストック。</li>
+              <li>「こう聞くと具体的なヒントが出るよ」と促し、共に試す。</li>
+              <li>AIから得た答えを一緒に検証し、学びを深める対話に。</li>
+            </ul>
+            <p class="note">AIは共同学習者。親も「知らないことを調べる姿」を見せましょう。</p>
+          </div>
+        </div>
+        <div class="progress"><i></i></div>
+      </section>
+
+      <section class="page" data-title="褒め方">
+        <header><h2>褒め方のポイント：子どもが望む形に寄り添う</h2></header>
+        <div class="card">
+          <ul>
+            <li><b>何を褒めてほしいか</b>を想像し、本人に確かめる。</li>
+            <li>褒める前に身体と言葉を子どもへ向け、全注意を注ぐ。</li>
+            <li>「どんな工夫をしたの？」と話してもらい、その内容に共感。</li>
+            <li>親の満足よりも、子どもの達成感や努力を言葉にする。</li>
+          </ul>
+          <p class="note">成功体験を本人の言葉で語ってもらうことで、学びが深まり自己効力感も上がります。</p>
+        </div>
+        <div class="progress"><i></i></div>
+      </section>
+
+      <section class="page" data-title="まとめ">
+        <header><h2>まとめ：環境と声かけで、子どもの「やる気のスイッチ」を守る</h2></header>
+        <div class="grid-2">
+          <div class="card">
+            <h3>今日からできる3ステップ</h3>
+            <ul>
+              <li>家族で学習環境・生活リズムを点検する。</li>
+              <li>声かけを命令形から問いかけ・共感に変換する。</li>
+              <li>親も学び時間をつくり、AI活用を一緒に体験する。</li>
+            </ul>
+          </div>
+          <div class="card">
+            <h3>覚えておきたいこと</h3>
+            <ul>
+              <li>主体性を奪わない範囲で関わる。</li>
+              <li>困ったときは「環境・声かけ・仕組み」を見直す。</li>
+              <li>家族はチーム。成功も失敗も共有して次へ繋げる。</li>
+            </ul>
+            <p class="note">親の安心感が、子どもの挑戦へのエネルギーに変わります。</p>
+          </div>
+        </div>
+        <div class="footer"><span>ご覧いただきありがとうございました</span><span>← / → で移動</span></div>
+        <div class="progress"><i></i></div>
+      </section>
+
+    </div>
+  </div>
+
+  <div class="nav">
+    <button class="btn" id="prev">← 前へ</button>
+    <button class="btn primary" id="next">次へ →</button>
+  </div>
+  <div class="indicator" id="indicator">1 / 10</div>
+
+  <script>
+    (function(){
+      const pages = [...document.querySelectorAll('.page')];
+      const indicator = document.getElementById('indicator');
+      let idx = 0;
+
+      const bar = () => document.querySelector('.page.active .progress > i');
+
+      function show(i, pushHash = true){
+        idx = Math.max(0, Math.min(i, pages.length - 1));
+        pages.forEach((p, k) => p.classList.toggle('active', k === idx));
+        const b = bar(); if (b) b.style.width = (((idx+1)/pages.length)*100) + '%';
+        indicator.textContent = (idx+1) + ' / ' + pages.length;
+        if(pushHash) location.hash = '#p' + (idx+1);
+        document.title = pages[idx].dataset.title + ' — 高校生サポートガイド';
+      }
+
+      function nav(delta){ show(idx + delta); }
+      document.getElementById('next').addEventListener('click', () => nav(1));
+      document.getElementById('prev').addEventListener('click', () => nav(-1));
+
+      window.addEventListener('keydown', (e)=>{
+        if (['ArrowRight','KeyD','PageDown','Space'].includes(e.code)) { e.preventDefault(); nav(1); }
+        if (['ArrowLeft','KeyA','PageUp'].includes(e.code)) { e.preventDefault(); nav(-1); }
+        if (e.code === 'Home') show(0);
+        if (e.code === 'End') show(pages.length - 1);
+        if (e.key.toLowerCase() === 't') toggleTheme();
+        if (e.key.toLowerCase() === 'p') window.print();
+      });
+
+      function fromHash(){
+        const m = location.hash.match(/p(\d+)/i);
+        if(m){
+          const n = parseInt(m[1], 10) - 1;
+          if(!Number.isNaN(n)) show(n, false);
+        }
+      }
+      window.addEventListener('hashchange', fromHash);
+      fromHash();
+      show(idx, false);
+
+      function toggleTheme(){
+        const root = document.documentElement;
+        root.setAttribute('data-theme', root.getAttribute('data-theme') === 'light' ? 'dark' : 'light');
+      }
+      document.getElementById('theme').addEventListener('click', toggleTheme);
+
+      document.getElementById('print').addEventListener('click', () => window.print());
+
+      const obs = new MutationObserver(()=>{
+        const b = bar();
+        if (b) b.style.width = (((idx+1)/pages.length)*100) + '%';
+      });
+      obs.observe(document.getElementById('pages'), { attributes:true, subtree:true, attributeFilter:['class'] });
+    })();
+  </script>
+</body>
+</html>
+上記をpdfに
